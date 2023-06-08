@@ -1,6 +1,5 @@
 *.txt
 *.csv
+*.h5
 !busstops_ida.csv
 bus-arrival-convlstm-master/
-LSTM-1min_.h5
-Standard_Scaler_LSTM-1min_.h5
