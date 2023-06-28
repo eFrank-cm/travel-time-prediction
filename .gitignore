@@ -1,5 +1,6 @@
 *.txt
 *.csv
+*.h5
 !busstops_ida.csv
 bus-arrival-convlstm-master/
 code_autor
