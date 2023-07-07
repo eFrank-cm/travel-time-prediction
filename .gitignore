@@ -4,3 +4,4 @@
 !busstops_ida.csv
 bus-arrival-convlstm-master/
 code_autor
+__pycache__
