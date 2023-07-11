@@ -1,5 +1,7 @@
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
+from sklearn.metrics import mean_squared_error, mean_absolute_error, mean_absolute_percentage_error
 import numpy as np
+import matplotlib.pyplot as plt
 
 def split_dataset(serie, tr_size=0.8, vl_size=0.1, ts_size=0.1 ):
     # Definir número de datos en cada subserie
@@ -154,7 +156,7 @@ def find_input(df, stop, time, input_size):
 
 def predecir(x, model, scaler, conv=False):
     # Calcular predicción escalada en el rango de -1 a 1
-    y_pred_s = model.predict(x,verbose=0)
+    y_pred_s = model.predict(x,verbose=1)
 
     # Llevar la predicción a la escala original
     if conv:
@@ -196,3 +198,60 @@ def predict_travel_time(n_links, shape_input, id_sample, data_in_s, data_in, mod
     
     return real, y_of_set, y_of_pred
 
+def plot_history_model(history, save_dir, title):
+    # Graficar curvas de entrenamiento y validación
+    # para verificar que no existe overfitting
+    fig, axs = plt.subplots(1, 3, figsize=(20, 6))
+
+    # Gráfico 1: RMSE
+    axs[0].plot(history.history['loss'], label='RMSE train')
+    axs[0].plot(history.history['val_loss'],label='RMSE val')
+    axs[0].set_xlabel('Iteración')
+    axs[0].set_ylabel('RMSE')
+    axs[0].legend()
+
+    # Gráfico 2: MAE
+    axs[1].plot(history.history['mae'], label='MAE train')
+    axs[1].plot(history.history['val_mae'],label='MAE val')
+    axs[1].set_xlabel('Iteración')
+    axs[1].set_ylabel('MAE')
+    axs[1].legend()
+
+    # Gráfico 3: MAPE
+    axs[2].plot(history.history['mape'], label='MAPE train')
+    axs[2].plot(history.history['val_mape'], label='MAPE val')
+    axs[2].set_xlabel('Iteración')
+    axs[2].set_ylabel('MAPE')
+    axs[2].legend()
+
+    plt.suptitle(title, fontsize=16)
+    plt.tight_layout()  # Ajusta automáticamente los espacios entre subplots
+    plt.savefig(save_dir)
+    plt.show()
+
+
+def RMSE_MAE_MAPE_seconds(Real_vec, Pred_vec):
+    vector_real = Real_vec.flatten()
+    vector_predicho = Pred_vec
+
+    # Calcular las métricas RSME - MSE - MAE
+    rmse = np.sqrt(mean_squared_error(vector_real, vector_predicho))
+    mae = mean_absolute_error(vector_real, vector_predicho)
+    mape = mean_absolute_percentage_error(vector_real, vector_predicho)
+
+    # Calcular el RMSE
+    return rmse, mae, mape
+
+def Print_Real_Metrics(tr_metrics, vl_metrics, ts_metrics):
+    print('Comparativo de desempeños con los conjuntos de datos y las predicciones del modelo en segundos:')
+    print(f'  RMSE train:\t {tr_metrics[0]:.3f}')
+    print(f'  RMSE val:\t {vl_metrics[0]:.3f}')
+    print(f'  RMSE test:\t {ts_metrics[0]:.3f}\n')
+
+    print(f'  MAE train:\t {tr_metrics[1]:.3f}')
+    print(f'  MAE val:\t {vl_metrics[1]:.3f}')
+    print(f'  MAE test:\t {ts_metrics[1]:.3f}\n')
+
+    print(f'  MAPE train:\t {tr_metrics[2]:.3f}')
+    print(f'  MAPE val:\t {vl_metrics[2]:.3f}')
+    print(f'  MAPE test:\t {ts_metrics[2]:.3f}')
