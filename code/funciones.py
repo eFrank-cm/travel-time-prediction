@@ -2,6 +2,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, mean_absolute_percentage_error
 import numpy as np
 import matplotlib.pyplot as plt
+import os, errno
 
 def split_dataset(serie, tr_size=0.8, vl_size=0.1, ts_size=0.1 ):
     # Definir número de datos en cada subserie
@@ -17,7 +18,7 @@ def split_dataset(serie, tr_size=0.8, vl_size=0.1, ts_size=0.1 ):
 
     return train, val, test
 
-def split_dataset_byN(dataset, n, tr_size=0.8, vl_size=0.1, ts_size=0.1 ):
+def split_dataset_byN(dataset, n, tr_size=0.7, vl_size=0.1, ts_size=0.1 ):
     # dividir el dataset por nro de samples
     n_sample = dataset.shape[0] / n
 
@@ -255,3 +256,50 @@ def Print_Real_Metrics(tr_metrics, vl_metrics, ts_metrics):
     print(f'  MAPE train:\t {tr_metrics[2]:.3f}')
     print(f'  MAPE val:\t {vl_metrics[2]:.3f}')
     print(f'  MAPE test:\t {ts_metrics[2]:.3f}')
+
+def generar_rangos(numero):
+    base = 83
+    inicio = (numero - 1) * base
+    fin = numero * base
+    return inicio, fin
+
+def plot_predict_samples(number_of_sample, df, y_predictions, save_directory, name_model):
+
+    plt.figure(figsize=(17, 6))
+    
+    # Elegir sample
+    variable1, variable2 = generar_rangos(number_of_sample)
+    links_83 = np.arange(83)
+    sample_true = df[variable1:variable2].reshape(-1, 1)
+    sample_predicted = y_predictions[variable1:variable2].reshape(-1, 1)
+
+    plt.plot(links_83,sample_true, label='true values',marker='o')
+    plt.plot(links_83,sample_predicted, label='predicted values',marker='o')
+
+    # Trazar una línea entrecortada entre los puntos
+    for i in range(len(links_83)):
+       plt.plot([links_83[i], links_83[i]], [sample_true[i], sample_predicted[i]], 'g--')
+
+    # Ajustar los límites de los ejes
+    plt.xlim(-1, 83)  # Ajustar límites del eje x
+    #plt.ylim(0, 200)  # Ajustar límites del eje y
+
+    plt.xlabel('Links (tramos entre paraderos)')
+    plt.ylabel('Time travel (seconds)')
+    plt.legend()
+    plt.title(str(name_model)+" SAMPLE "+ str(number_of_sample))
+
+    plt.savefig(save_directory)
+    # Mostrar el gráfico
+    plt.show();
+
+def create_dir_gpu(name_gpu):
+    try:
+        os.mkdir(f'../graphs/{name_gpu}')
+        os.mkdir(f'../models/{name_gpu}')
+        os.mkdir(f'../info_models/{name_gpu}')
+        os.mkdir(f'../graphs/{name_gpu}/preds')
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+    print(f'Directorios listos para: {name_gpu}')
