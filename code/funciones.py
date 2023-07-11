@@ -161,6 +161,7 @@ def predecir(x, model, scaler, conv=False):
     # Llevar la predicción a la escala original
     if conv:
         y_pred = scaler.inverse_transform(y_pred_s.reshape((-1, 1)))
+        y_pred = np.array([y_pred[i*4] for i in range(y_pred.shape[0]//4)])
     else:
         y_pred = scaler.inverse_transform(y_pred_s)
 
