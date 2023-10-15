@@ -130,7 +130,7 @@ def cargar_dataset(dataset, div_split, inout_shape, name_scaler, conv):
 
     col_y = dataset.columns.get_loc('travel_time')
     scaler = {
-        'Maxmin': MinMaxScaler(feature_range=(-1,1)),
+        'Maxmin': MinMaxScaler(feature_range=(0,1)),
         'Standar': StandardScaler(),
         'Robust': RobustScaler()
     }
